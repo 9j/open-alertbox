@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInterval } from 'react-use';
 import { ScaleUpDownSpan } from '@/components/ScaleUpDownSpan';
+import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 
 type Message = {
   name: string;
@@ -16,27 +17,22 @@ export default function Overlay() {
   const [message, setMessage] = useState<Message | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const socketUrl = 'ws://localhost:8080/websocket';
+  const { lastMessage, readyState } = useWebSocket<
+    Array<{
+      name: string;
+      amount: number;
+      message: string;
+    }>
+  >(socketUrl);
+
   useEffect(() => {
-    const source = new EventSource('/api/overlay');
-
-    source.onmessage = function (event) {
-      console.log('Server-sent event received:', event.data);
-      const newMessages = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-    };
-
-    source.onerror = function (error) {
-      console.error(
-        'Error occurred while receiving server-sent events:',
-        error,
-      );
-    };
-
-    return () => {
-      source.close();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (lastMessage) {
+      const data = JSON.parse(lastMessage.data);
+      console.log('data', data);
+      setMessages((prev) => prev.concat(data));
+    }
+  }, [lastMessage, readyState]);
 
   useInterval(() => {
     if (messages.length === 0) {

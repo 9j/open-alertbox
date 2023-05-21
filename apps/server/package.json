@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "server",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node build/index.js",
+    "dev": "ts-node-dev ./index.ts"
+  },
+  "dependencies": {
+    "@fastify/websocket": "^8.1.0",
+    "fastify": "^4.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1",
+    "@types/ws": "^8.5.4",
+    "database": "*",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.4"
+  }
+}
