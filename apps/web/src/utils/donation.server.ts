@@ -11,6 +11,7 @@ type FormValues = {
 
 export const donation = zact(
   z.object({
+    type: z.enum(['TEXT', 'VIDEO']),
     name: z.string(),
     amount: z.number(),
     message: z.string(),
@@ -21,7 +22,7 @@ export const donation = zact(
       name: input.name,
       amount: input.amount,
       message: input.message,
-      type: 'DONATION',
+      type: input.type,
     },
   });
 });

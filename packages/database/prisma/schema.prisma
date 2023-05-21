@@ -9,9 +9,8 @@ generator client {
 }
 
 enum AlertType {
-  DONATION
-  SUBSCRIPTION
-  FOLLOW
+  TEXT
+  VIDEO
 }
 
 model AlertEvent {

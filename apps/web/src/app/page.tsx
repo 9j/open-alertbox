@@ -6,12 +6,19 @@ import { useZact } from 'zact/client';
 import { donation } from '@/utils/donation.server';
 
 type FormValues = {
+  type: 'TEXT' | 'VIDEO';
   name: string;
   amount: number;
   message: string;
 };
 export default function Home() {
-  const { register, handleSubmit } = useForm<FormValues>();
+  const { register, watch, handleSubmit } = useForm<FormValues>({
+    defaultValues: {
+      type: 'TEXT',
+      amount: 1000,
+    },
+  });
+  const type = watch('type');
   const { mutate } = useZact(donation);
 
   return (
@@ -20,6 +27,36 @@ export default function Home() {
         onSubmit={handleSubmit(mutate)}
         className="w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex flex-col"
       >
+        <div className="mb-4">
+          <span className="block text-gray-700 text-sm font-bold mb-2">
+            Type:
+          </span>
+          <div className="flex items-center">
+            <input
+              type="radio"
+              id="text"
+              value="TEXT"
+              {...register('type', { required: true })}
+              className="text-blue-500 focus:ring-blue-500"
+            />
+            <label htmlFor="text" className="ml-2 text-gray-700 text-sm">
+              Text
+            </label>
+          </div>
+          <div className="flex items-center mt-2">
+            <input
+              type="radio"
+              id="video"
+              value="VIDEO"
+              {...register('type', { required: true })}
+              className="text-blue-500 focus:ring-blue-500"
+            />
+            <label htmlFor="video" className="ml-2 text-gray-700 text-sm">
+              Video
+            </label>
+          </div>
+        </div>
+
         <div className="mb-4">
           <label
             htmlFor="name"
@@ -55,7 +92,7 @@ export default function Home() {
             htmlFor="message"
             className="block text-gray-700 text-sm font-bold mb-2"
           >
-            Message:
+            {type === 'TEXT' ? 'Message' : 'Video URL'}:
           </label>
           <textarea
             id="message"
