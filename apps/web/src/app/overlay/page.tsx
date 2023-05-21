@@ -47,14 +47,12 @@ export default function Overlay() {
     event.target.playVideo();
   };
 
-  const videoIdRegex = /(?<=be\/).+?(?=\?)/;
-  const startTimeRegex = /(?<=t=).+/;
+  const regex = /youtu.be\/([a-zA-Z0-9_-]*)\?.*t=(\d*)/;
+  const match = message?.message.match(regex);
 
-  const videoIdMatch = message?.message.match(videoIdRegex);
-  const startTimeMatch = message?.message.match(startTimeRegex);
-
-  const videoId = videoIdMatch?.[0];
-  const startTime = startTimeMatch?.[0];
+  const videoId = match[1];
+  const startTime = match[2];
+  console.log(videoId, startTime);
 
   const opts: YouTubeProps['opts'] = {
     height: '100%',
