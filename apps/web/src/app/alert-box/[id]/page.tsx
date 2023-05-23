@@ -52,12 +52,14 @@ export default function Overlay() {
     if (isVisible) {
       return;
     }
-    setMessage(messages[0]);
+
+    const newMessage = messages[0];
+    setMessage(newMessage);
     setMessages((prevMessages) => prevMessages.slice(1));
 
     setIsVisible(true);
 
-    if (message?.type === 'TEXT') {
+    if (newMessage?.type === 'TEXT') {
       handleTimeOut(10000);
     }
   }, 1000);
