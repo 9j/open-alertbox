@@ -8,6 +8,8 @@ import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 import YouTube, { YouTubeProps } from 'react-youtube';
 import { getStartSeconds, getVideoId } from '@/utils/youtube';
 import { useParams } from 'next/navigation';
+import DefaultImage from '@/assets/default.webp';
+import Image from 'next/image';
 
 type Message = {
   name: string;
@@ -99,17 +101,23 @@ export default function Overlay() {
               opts={opts}
               onReady={handleOnPlayerReady}
               onPlay={handleOnPlay}
-              className="relative w-full h-full flex-1 mb-4"
+              className="relative w-full h-full flex-1 mb-8"
             />
-          ) : null}
-          <p>
-            <ScaleUpDownSpan>{message?.name}</ScaleUpDownSpan> 님{' '}
-            <ScaleUpDownSpan>
-              {Intl.NumberFormat().format(message?.amount ?? 0)}
-            </ScaleUpDownSpan>{' '}
-            후원 감사합니다
-          </p>
-          <p>{message.type === 'TEXT' ? message?.message : '[Video]'}</p>
+          ) : (
+            <Image src={DefaultImage} className="w-1/2 mb-16" alt="" />
+          )}
+          <div className="flex flex-col gap-8">
+            <p>
+              <ScaleUpDownSpan>{message?.name}</ScaleUpDownSpan> 님{' '}
+              <ScaleUpDownSpan>
+                {Intl.NumberFormat().format(message?.amount ?? 0)}
+              </ScaleUpDownSpan>{' '}
+              후원 감사합니다
+            </p>
+            <p className="leading-normal">
+              {message.type === 'TEXT' ? message?.message : '[Video]'}
+            </p>
+          </div>
         </motion.div>
       ) : null}
     </AnimatePresence>
