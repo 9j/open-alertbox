@@ -7,9 +7,10 @@ server.register(import('@fastify/websocket'));
 
 server.register(async function (fastify) {
   fastify.get(
-    '/websocket',
+    '/:alertBoxId',
     { websocket: true },
     (connection /* SocketStream */, req /* FastifyRequest */) => {
+      const { alertBoxId } = req.params as { alertBoxId: string };
       let lastSentTime = new Date();
       let timer = setInterval(async () => {
         const donations = await prisma.alertEvent.findMany({
@@ -23,6 +24,9 @@ server.register(async function (fastify) {
           where: {
             createdAt: {
               gt: lastSentTime,
+            },
+            streamer: {
+              alertBoxId: alertBoxId,
             },
           },
           orderBy: {

@@ -14,11 +14,23 @@ enum AlertType {
 }
 
 model AlertEvent {
-  id        String    @id @default(cuid())
-  type      AlertType
-  name      String
-  message   String?
-  amount    Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  streamer   Streamer  @relation(fields: [streamerId], references: [id])
+  streamerId String
+  type       AlertType
+  name       String
+  message    String?
+  amount     Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Streamer {
+  id         String       @id @default(cuid())
+  alertBoxId String       @unique @default(uuid())
+  username   String       @unique
+  name       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  AlertEvent AlertEvent[]
 }

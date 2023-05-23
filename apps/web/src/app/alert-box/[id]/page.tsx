@@ -6,6 +6,8 @@ import { useInterval } from 'react-use';
 import { ScaleUpDownSpan } from '@/components/ScaleUpDownSpan';
 import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 import YouTube, { YouTubeProps } from 'react-youtube';
+import { getStartSeconds, getVideoId } from '@/utils/youtube';
+import { useParams } from 'next/navigation';
 
 type Message = {
   name: string;
@@ -16,10 +18,16 @@ type Message = {
 
 export default function Overlay() {
   const [messages, setMessages] = useState<Message[]>([]);
+
   const [message, setMessage] = useState<Message | null>(null);
+  const videoId = getVideoId(message?.message ?? '');
+  const startTime = getStartSeconds(message?.message ?? '');
+
   const [isVisible, setIsVisible] = useState(false);
 
-  const socketUrl = 'ws://localhost:8080/websocket';
+  const { id } = useParams();
+
+  const socketUrl = `ws://localhost:8080/${id}`;
   const { lastMessage, readyState } = useWebSocket(socketUrl, {
     shouldReconnect: () => true,
   });
@@ -35,24 +43,21 @@ export default function Overlay() {
     if (messages.length === 0) {
       return;
     }
+    if (isVisible) {
+      return;
+    }
     setMessage(messages[0]);
     setMessages((prevMessages) => prevMessages.slice(1));
+
     setIsVisible(true);
     setTimeout(() => {
       setIsVisible(false);
-    }, 3000);
-  }, 5000);
+    }, 10000);
+  }, 1000);
 
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
     event.target.playVideo();
   };
-
-  const regex = /youtu.be\/([a-zA-Z0-9_-]*)\?.*t=(\d*)/;
-  const match = message?.message.match(regex);
-
-  const videoId = match[1];
-  const startTime = match[2];
-  console.log(videoId, startTime);
 
   const opts: YouTubeProps['opts'] = {
     height: '100%',
@@ -73,7 +78,6 @@ export default function Overlay() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 3 }}
           className="fixed bottom-0 left-0 right-0 w-full h-full items-center justify-end text-center text-6xl font-bold text-white drop-shadow-md shadow-black flex flex-col pb-4"
         >
           {message?.type === 'VIDEO' ? (

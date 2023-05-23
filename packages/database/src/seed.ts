@@ -1,22 +1,30 @@
-import { prisma } from ".";
+import { prisma } from '.';
 
-import type { User } from "@prisma/client";
+import type { Streamer } from '@prisma/client';
 
 const DEFAULT_USERS = [
   // Add your own user to pre-populate the database with
   {
-    name: "Tim Apple",
-    email: "tim@apple.com",
+    name: 'Tim Cook',
+    username: 'tim_cook',
   },
-] as Array<Partial<User>>;
+  {
+    name: 'Jeff Bezos',
+    username: 'jeffbezos',
+  },
+  {
+    name: 'Elon Musk',
+    username: 'elonmusk',
+  },
+] as Array<Streamer>;
 
 (async () => {
   try {
     await Promise.all(
       DEFAULT_USERS.map((user) =>
-        prisma.user.upsert({
+        prisma.streamer.upsert({
           where: {
-            email: user.email!,
+            username: user.username,
           },
           update: {
             ...user,
@@ -24,8 +32,8 @@ const DEFAULT_USERS = [
           create: {
             ...user,
           },
-        })
-      )
+        }),
+      ),
     );
   } catch (error) {
     console.error(error);

@@ -1,113 +1,76 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { useZact } from 'zact/client';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
-import { donation } from '@/utils/donation.server';
-
-type FormValues = {
-  type: 'TEXT' | 'VIDEO';
-  name: string;
-  amount: number;
-  message: string;
-};
 export default function Home() {
-  const { register, watch, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      type: 'TEXT',
-      amount: 1000,
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { delay: 0.5, duration: 1 },
     },
-  });
-  const type = watch('type');
-  const { mutate } = useZact(donation);
+    exit: {
+      x: '-100vw',
+      transition: { ease: 'easeInOut' },
+    },
+  };
+
+  const router = useRouter();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const alertBoxId = formData.get('alertBoxId');
+    router.push(`/alert-box/${alertBoxId}`);
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <form
-        onSubmit={handleSubmit(mutate)}
-        className="w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex flex-col"
-      >
-        <div className="mb-4">
-          <span className="block text-gray-700 text-sm font-bold mb-2">
-            Type:
-          </span>
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="text"
-              value="TEXT"
-              {...register('type', { required: true })}
-              className="text-blue-500 focus:ring-blue-500"
-            />
-            <label htmlFor="text" className="ml-2 text-gray-700 text-sm">
-              Text
-            </label>
-          </div>
-          <div className="flex items-center mt-2">
-            <input
-              type="radio"
-              id="video"
-              value="VIDEO"
-              {...register('type', { required: true })}
-              className="text-blue-500 focus:ring-blue-500"
-            />
-            <label htmlFor="video" className="ml-2 text-gray-700 text-sm">
-              Video
-            </label>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Name:
-          </label>
-          <input
-            type="text"
-            id="name"
-            {...register('name', { required: true })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Your Name"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="amount"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Amount:
-          </label>
-          <input
-            type="number"
-            id="amount"
-            {...register('amount', { required: true, valueAsNumber: true })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Amount"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="message"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            {type === 'TEXT' ? 'Message' : 'Video URL'}:
-          </label>
-          <textarea
-            id="message"
-            {...register('message', { required: true })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Your Message"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+    <motion.div
+      className="container flex place-items-center h-screen w-full mx-auto my-0 justify-center"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <motion.div className="text-center space-y-4 p-4 md:p-0">
+        <motion.h1
+          className="text-4xl font-bold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
         >
-          Submit
-        </button>
-      </form>
-    </main>
+          OPEN ALERTBOX
+        </motion.h1>
+        <motion.p
+          className="text-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+        >
+          Easily customize your AlertBox for broadcast.
+        </motion.p>
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col space-y-4 place-items-center">
+            <motion.input
+              type="text"
+              className="border-2 border-gray-300 p-2 rounded w-full"
+              name="alertBoxId"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.75, duration: 1 }}
+              placeholder="Enter your AlertBox ID"
+            />
+            <motion.button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              Open AlertBox
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
   );
 }
