@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInterval } from 'react-use';
 import { ScaleUpDownSpan } from '@/components/ScaleUpDownSpan';
@@ -39,6 +39,12 @@ export default function Overlay() {
     }
   }, [lastMessage, readyState]);
 
+  const handleTimeOut = useCallback((ms: number) => {
+    setTimeout(() => {
+      setIsVisible(false);
+    }, ms);
+  }, []);
+
   useInterval(() => {
     if (messages.length === 0) {
       return;
@@ -50,12 +56,17 @@ export default function Overlay() {
     setMessages((prevMessages) => prevMessages.slice(1));
 
     setIsVisible(true);
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 10000);
+
+    if (message?.type === 'TEXT') {
+      handleTimeOut(10000);
+    }
   }, 1000);
 
-  const onPlayerReady: YouTubeProps['onReady'] = (event) => {
+  const handleOnPlay = useCallback(() => {
+    handleTimeOut(10000);
+  }, [handleTimeOut]);
+
+  const handleOnPlayerReady: YouTubeProps['onReady'] = (event) => {
     event.target.playVideo();
   };
 
@@ -84,7 +95,8 @@ export default function Overlay() {
             <YouTube
               videoId={videoId}
               opts={opts}
-              onReady={onPlayerReady}
+              onReady={handleOnPlayerReady}
+              onPlay={handleOnPlay}
               className="relative w-full h-full flex-1 mb-4"
             />
           ) : null}
